@@ -1,26 +1,18 @@
-import 'package:intl/intl.dart';
 
-class Note {
+import 'package:hive/hive.dart';
+part 'note_model.g.dart';
+
+@HiveType(typeId: 0)
+class NoteModel extends HiveObject {
+  @HiveField(0)
   String title;
+  @HiveField(1)
   String description;
-  DateTime date;
+  @HiveField(2)
+  final DateTime date;
 
-  Note({required this.title, required this.description, required this.date});
-
-  // Convert a Note into a Map. The keys must correspond to the names of the
-  // columns in the database.
-  Map<String, dynamic> toMap() {
-    return {
-      'title': title,
-      'description': description,
-      'date': DateFormat('yyyy-MM-dd - kk:mm').format(date),
-    };
-  }
-
-  // Convert a Map into a Note. The keys must correspond to the names of the
-  // columns in the database.
-  Note.fromMap(Map<String, dynamic> map)
-      : title = map['title'],
-        description = map['description'],
-        date = DateTime.parse(map['date']);
+  NoteModel(
+      {required this.title,
+      required this.description,
+      required this.date});
 }

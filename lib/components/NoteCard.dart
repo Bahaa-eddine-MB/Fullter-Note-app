@@ -8,9 +8,9 @@ class NoteCard extends StatelessWidget {
       required this.note,
       required this.selectNote,
       required this.removeNote});
-  final Note note;
-  final Function(Note) selectNote;
-  final Function(Note) removeNote;
+  final NoteModel note;
+  final Function(NoteModel) selectNote;
+  final Function(NoteModel) removeNote;
 
   @override
   Widget build(BuildContext context) {

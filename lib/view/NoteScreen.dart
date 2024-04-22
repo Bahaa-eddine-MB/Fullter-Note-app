@@ -5,7 +5,7 @@ import 'package:note_apps/utils/text_to_speech.dart';
 
 class NoteDetailsScreen extends StatefulWidget {
   const NoteDetailsScreen({super.key, required this.note});
-  final Note note;
+  final NoteModel note;
 
   @override
   _NoteDetailsScreenState createState() => _NoteDetailsScreenState();

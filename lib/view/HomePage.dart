@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:note_apps/Models/note_model.dart';
 import 'package:note_apps/components/NoteCard.dart';
 import 'package:note_apps/utils/routeObserver.dart';
@@ -13,19 +14,22 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with RouteAware, WidgetsBindingObserver {
-  List<Note> notes = [];
-  Note? selectedNote;
+  List<NoteModel> notes = [];
+  NoteModel? selectedNote;
   bool isSpeaking = false;
+  var notesBox = Hive.box<NoteModel>("notes_box");
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    notes = notesBox.values.toList();
+    setState(() {});
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -79,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen>
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.note_add_outlined),
         onPressed: () async {
-          final result = await showDialog<Note>(
+          final result = await showDialog<NoteModel>(
             context: context,
             builder: (context) {
               String title = '';
@@ -121,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen>
                   TextButton(
                     child: const Text('Add'),
                     onPressed: () {
-                      Navigator.of(context).pop(Note(
+                      Navigator.of(context).pop(NoteModel(
                           title: title,
                           description: description,
                           date: DateTime.now()));
@@ -132,7 +136,8 @@ class _HomeScreenState extends State<HomeScreen>
             },
           );
           if (result != null) {
-            setState(() {
+            setState(() async {
+              await notesBox.add(result);
               notes.add(result);
             });
           }
@@ -173,7 +178,8 @@ class _HomeScreenState extends State<HomeScreen>
                 selectedNote = notes[index];
               });
             },
-            removeNote: (note) {
+            removeNote: (note) async {
+              await notesBox.delete(notes[index]);
               setState(() {
                 notes.remove(notes[index]);
               });
@@ -182,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildNoteDetails(Note note) {
+  Widget _buildNoteDetails(NoteModel note) {
     return SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -223,7 +229,8 @@ class _HomeScreenState extends State<HomeScreen>
                   isSpeaking = true;
                 });
                 // Read the note title
-                String speakText = "Note title: ${note.title}. Note description: ${note.description}";
+                String speakText =
+                    "Note title: ${note.title}. Note description: ${note.description}";
                 await TextToSpeech.speak(speakText);
               }
             },
